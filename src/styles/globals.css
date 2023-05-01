@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#__next {
+  @apply bg-gray-900 text-white;
+  min-height: 100vh;
+}
+
+.checkerboard {
+  background: transparent
+    url('data:image/svg+xml,\
+      <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" fill-opacity=".25" >\
+        <rect x="200" width="200" height="200" />\
+        <rect y="200" width="200" height="200" />\
+      </svg>');
+  background-size: 30px 30px;
+}
