@@ -2,7 +2,7 @@ import MainLayout from "@/layouts/MainLayout";
 
 export default function Imprint() {
   return (
-    <MainLayout>
+    <MainLayout centerContent>
       <div className="max-w-4xl mx-auto text-xl">
         <h1 className="font-bold text-5xl mb-2">Privacy Policy</h1>
         <p>

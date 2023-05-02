@@ -7,6 +7,29 @@ body,
 #__next {
   @apply bg-gray-900 text-white;
   min-height: 100vh;
+  overflow: overlay;
+}
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent rgba(255, 255, 255, 0.25);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #333;
+  border-radius: 8px;
+  border: none;
 }
 
 .checkerboard {

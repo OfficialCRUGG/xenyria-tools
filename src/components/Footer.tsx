@@ -7,7 +7,16 @@ export function Footer() {
         <div className="max-w-4xl mx-auto w-full flex justify-between items-center py-6">
           <div className="flex flex-col">
             <p>© 2023 CRUGG (crg.sh)</p>
-            <p>Licensed under MIT License</p>
+            <p>
+              Licensed under{" "}
+              <a
+                href="https://github.com/OfficialCRUGG/xenyria-tools/blob/main/LICENSE"
+                target="_blank"
+                rel="noreferrer"
+              >
+                MIT License
+              </a>
+            </p>
             <p className="text-sm text-white/75 mt-2">
               Xenyria Tools is not affiliated with Mojang Studios or Xenyria.net
             </p>

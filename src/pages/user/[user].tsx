@@ -11,6 +11,7 @@ import {
   User as UserIcon,
 } from "@phosphor-icons/react";
 import dynamic from "next/dynamic";
+import { useState } from "react";
 
 const ReactSkinview3d = dynamic(() => import("react-skinview3d"), {
   ssr: false,
@@ -86,6 +87,11 @@ export default function User({
   xenyriaVotes?: any;
   notFound?: boolean;
 }) {
+  const [profileOpen, setProfileOpen] = useState<boolean>(true);
+  const [paintSquadOpen, setPaintSquadOpen] = useState<boolean>(false);
+  const [rushOpen, setRushOpen] = useState<boolean>(false);
+  const [kingdomsOpen, setKingdomsOpen] = useState<boolean>(false);
+
   return (
     <MainLayout>
       {notFound ? (
@@ -129,7 +135,14 @@ export default function User({
               <GroupBadge group={xenyriaGroup.group_id} />
             </div>
             <div className="w-full flex flex-col space-y-4">
-              <DataCard heading="Profile" icon={UserIcon}>
+              <DataCard
+                heading="Profile"
+                icon={UserIcon}
+                open={profileOpen}
+                onHeadingClick={() => {
+                  setProfileOpen(!profileOpen);
+                }}
+              >
                 <div className="grid grid-cols-2 grid-cols-[min-content,1fr] gap-x-6">
                   <div className="font-semibold whitespace-nowrap">
                     Play time
@@ -161,7 +174,14 @@ export default function User({
                   </div>
                 </div>
               </DataCard>
-              <DataCard heading="PaintSquad" icon={PaintRoller}>
+              <DataCard
+                heading="PaintSquad"
+                icon={PaintRoller}
+                open={paintSquadOpen}
+                onHeadingClick={() => {
+                  setPaintSquadOpen(!paintSquadOpen);
+                }}
+              >
                 <div className="py-8 flex flex-col items-center">
                   <Barricade weight="fill" size={64} />
                   <h3 className="font-semibold text-2xl">
@@ -172,7 +192,14 @@ export default function User({
                   </h4>
                 </div>
               </DataCard>
-              <DataCard heading="Rush" icon={Car}>
+              <DataCard
+                heading="Rush"
+                icon={Car}
+                open={rushOpen}
+                onHeadingClick={() => {
+                  setRushOpen(!rushOpen);
+                }}
+              >
                 <div className="py-8 flex flex-col items-center">
                   <Barricade weight="fill" size={64} />
                   <h3 className="font-semibold text-2xl">
@@ -183,7 +210,14 @@ export default function User({
                   </h4>
                 </div>
               </DataCard>
-              <DataCard heading="Kingdoms" icon={CastleTurret}>
+              <DataCard
+                heading="Kingdoms"
+                icon={CastleTurret}
+                open={kingdomsOpen}
+                onHeadingClick={() => {
+                  setKingdomsOpen(!kingdomsOpen);
+                }}
+              >
                 <div className="py-8 flex flex-col items-center">
                   <Barricade weight="fill" size={64} />
                   <h3 className="font-semibold text-2xl">
