@@ -100,6 +100,8 @@ export default function PlayerView({
                   width="250"
                   onReady={({ viewer }) => {
                     viewer.controls.enableZoom = false;
+                    viewer.controls.enableDamping = true;
+                    viewer.controls.dampingFactor = 0.2;
                   }}
                 />
               </div>
