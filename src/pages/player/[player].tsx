@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import DataCard from "@/components/DataCard";
-import GroupBadge from "@/components/GroupBadge";
+import RankBadge from "@/components/RankBadge";
 import MainLayout from "@/layouts/MainLayout";
 import { getSDK } from "@/lib/sdk";
 import {
@@ -100,7 +100,7 @@ export default function PlayerView({
                   width="250"
                 />
               </div>
-              <GroupBadge category={rank.rankCategory} />
+              <RankBadge category={rank.rankCategory} />
             </div>
             <div className="w-full flex flex-col space-y-4">
               <DataCard

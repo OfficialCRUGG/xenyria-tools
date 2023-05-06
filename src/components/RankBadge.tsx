@@ -1,6 +1,6 @@
 import { RankCategory, rankCategoryMap } from "xenyria-sdk";
 
-export default function GroupBadge({ category }: { category: RankCategory }) {
+export default function RankBadge({ category }: { category: RankCategory }) {
   const data = (() => {
     switch (category) {
       case RankCategory.Administration:
