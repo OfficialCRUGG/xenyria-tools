@@ -2,6 +2,7 @@
 import DataCard from "@/components/DataCard";
 import GroupBadge from "@/components/GroupBadge";
 import MainLayout from "@/layouts/MainLayout";
+import { getSDK } from "@/lib/sdk";
 import {
   Barricade,
   Car,
@@ -12,79 +13,46 @@ import {
 } from "@phosphor-icons/react";
 import dynamic from "next/dynamic";
 import { useState } from "react";
+import { PlayerRank, PlayerVotes } from "xenyria-sdk";
+import { Player } from "xenyria-sdk";
 
 const ReactSkinview3d = dynamic(() => import("react-skinview3d"), {
   ssr: false,
 });
 
 export async function getServerSideProps({ params }: any) {
-  const xenyriaUser = await (
-    await fetch(
-      `https://api.xenyria.net/player/fetch?username=${params.user}`,
-      {
-        headers: {
-          Authorization: `Xen-Token ${process.env.XENYRIA_TOKEN}`,
-        },
-      }
-    )
-  ).json();
+  try {
+    const player = await getSDK().player.get(params.player);
+    const rank = await player.getRank();
+    const votes = await player.getVotes();
 
-  console.log(xenyriaUser);
+    console.log(player.toJSON());
 
-  const userExists =
-    xenyriaUser?.success && xenyriaUser?.message !== "User not found";
-
-  if (!userExists) {
+    return {
+      props: {
+        player: player.toJSON(),
+        rank,
+        votes,
+      },
+    };
+  } catch (error) {
     return {
       props: {
         notFound: true,
       },
     };
   }
-
-  const xenyriaGroup = await (
-    await fetch(
-      `https://api.xenyria.net/player/group?xen_id=${xenyriaUser.data.xen_id}`,
-      {
-        headers: {
-          Authorization: `Xen-Token ${process.env.XENYRIA_TOKEN}`,
-        },
-      }
-    )
-  ).json();
-
-  const xenyriaVotes = await (
-    await fetch(
-      `https://api.xenyria.net/player/votes?xen_id=${xenyriaUser.data.xen_id}`,
-      {
-        headers: {
-          Authorization: `Xen-Token ${process.env.XENYRIA_TOKEN}`,
-        },
-      }
-    )
-  ).json();
-
-  return {
-    props: {
-      user: params.user,
-      xenyriaUser: xenyriaUser.data,
-      xenyriaGroup: xenyriaGroup.data,
-      xenyriaVotes: xenyriaVotes.data,
-    },
-  };
 }
 
-export default function User({
-  user,
-  xenyriaUser,
-  xenyriaGroup,
-  xenyriaVotes,
+export default function PlayerView({
+  player,
+  rank,
+  votes,
   notFound,
 }: {
-  user: string;
-  xenyriaUser?: any;
-  xenyriaGroup?: any;
-  xenyriaVotes?: any;
+  player?: Player;
+  rank?: PlayerRank;
+  votes?: PlayerVotes;
   notFound?: boolean;
 }) {
   const [profileOpen, setProfileOpen] = useState<boolean>(true);
@@ -94,7 +62,7 @@ export default function User({
 
   return (
     <MainLayout>
-      {notFound ? (
+      {notFound || !player || !rank || !votes ? (
         <div className="flex flex-col items-center text-center">
           <SmileySad size={128} weight="fill" />
           <h1 className="font-bold text-3xl">
@@ -104,8 +72,8 @@ export default function User({
       ) : (
         <div className="max-w-4xl mx-auto w-full">
           <div className="flex space-x-4 items-center">
-            <h1 className="font-bold text-4xl">{user}</h1>
-            {xenyriaUser.language === "german" ? (
+            <h1 className="font-bold text-4xl">{player.username}</h1>
+            {player.language === "german" ? (
               <img
                 className="h-6"
                 src="https://flags.blazing.works/svg/de.svg"
@@ -126,13 +94,13 @@ export default function User({
                 style={{ height: 400, width: 250 }}
               >
                 <ReactSkinview3d
-                  skinUrl={`https://crafatar.com/skins/${xenyriaUser.uuid}`}
-                  capeUrl={`https://crafatar.com/capes/${xenyriaUser.uuid}`}
+                  skinUrl={`https://crafatar.com/skins/${player.uuid}`}
+                  capeUrl={`https://crafatar.com/capes/${player.uuid}`}
                   height="400"
                   width="250"
                 />
               </div>
-              <GroupBadge group={xenyriaGroup.group_id} />
+              <GroupBadge category={rank.rankCategory} />
             </div>
             <div className="w-full flex flex-col space-y-4">
               <DataCard
@@ -148,29 +116,29 @@ export default function User({
                     Play time
                   </div>
                   <div className="font w-full place-self-center">
-                    {formatPlayTime(xenyriaUser.playtime_in_seconds)}
+                    {formatPlayTime(player.playTime.seconds)}
                   </div>
                   <div className="font-semibold whitespace-nowrap">
                     Total Votes
                   </div>
                   <div className="font w-full place-self-center">
-                    {xenyriaVotes.total_vote_count}
+                    {votes.votes}
                   </div>
                   <div className="font-semibold whitespace-nowrap">
                     Vote Streak
                   </div>
                   <div className="font w-full place-self-center">
-                    {xenyriaVotes.current_vote_streak}
+                    {votes.voteStreak}
                   </div>
                   <div className="font-semibold whitespace-nowrap">
                     Xenyria ID
                   </div>
                   <div className="font-mono text-sm w-full place-self-center">
-                    {xenyriaUser.xen_id}
+                    {player.xenId}
                   </div>
                   <div className="font-semibold whitespace-nowrap">UUID</div>
                   <div className="font-mono text-sm w-full place-self-center">
-                    {xenyriaUser.uuid}
+                    {player.uuid}
                   </div>
                 </div>
               </DataCard>

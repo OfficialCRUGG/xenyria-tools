@@ -20,14 +20,14 @@ export function Hero() {
         onChange={(e) => setUsername(e.target.value)}
         onKeyDown={(key) => {
           if (key.code === "Enter" && username.length > 0) {
-            router.push(`/user/${username}`);
+            router.push(`/player/${username}`);
           }
         }}
         type="text"
       />
       <Link
         className="flex items-center space-x-2 bg-black rounded-full px-8 py-3 text-xl font-semibold mt-4 hover:bg-opacity-10 transition duration-200 hover:bg-opacity-10 hover:bg-black hover:bg-opacity-30"
-        href={`/user/${username}`}
+        href={`/player/${username}`}
       >
         <span>Look up</span>
         <MagnifyingGlass weight="bold" size={24} />

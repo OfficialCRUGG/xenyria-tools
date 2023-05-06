@@ -23,6 +23,10 @@
     "react-dom": "18.2.0",
     "react-skinview3d": "^5.0.1",
     "tailwindcss": "3.3.2",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "xenyria-sdk": "link:/Users/crugg/code/xenyria-sdk"
+  },
+  "devDependencies": {
+    "xenyria-api-types": "^0.5.0"
   }
 }

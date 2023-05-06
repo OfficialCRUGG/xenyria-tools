@@ -1,29 +1,24 @@
-export default function GroupBadge({ group }: { group: string }) {
+import { RankCategory, rankCategoryMap } from "xenyria-sdk";
+
+export default function GroupBadge({ category }: { category: RankCategory }) {
   const data = (() => {
-    switch (group) {
-      case "admin":
-        return { color: "bg-red-500", text: "Admin" };
-      case "dev":
-        return { color: "bg-cyan-500", text: "Dev" };
-      case "bauleitung":
-      case "architektmeister":
-      case "architekt":
-      case "architektenlehrling":
-        return { color: "bg-green-500", text: "Builder" };
-      case "modleitung":
-      case "mod":
-      case "moderatorlehrling":
-        return { color: "bg-yellow-500", text: "Mod" };
-      case "designer":
-        return { color: "bg-cyan-600", text: "Designer" };
-      case "Social-Media-Manager":
+    switch (category) {
+      case RankCategory.Administration:
+        return { color: "bg-red-500", text: "Administration" };
+      case RankCategory.Development:
+        return { color: "bg-cyan-500", text: "Development" };
+      case RankCategory.Building:
+        return { color: "bg-green-500", text: "Building" };
+      case RankCategory.Moderation:
+        return { color: "bg-yellow-500", text: "Moderation" };
+      case RankCategory.Design:
+        return { color: "bg-cyan-600", text: "Design" };
+      case RankCategory.SocialMedia:
         return { color: "bg-red-400", text: "Social Media" };
-      case "teammitglied":
-        return { color: "bg-gray-400", text: "Team" };
-      case "Helper":
-        return { color: "bg-orange-400", text: "Helper" };
-      case "Premium":
-        return { color: "bg-cyan-400", text: "Premium" };
+      case RankCategory.Staff:
+        return { color: "bg-orange-500", text: "Staff" };
+      case RankCategory.Player:
+        return { color: "bg-gray-700", text: "Player" };
       default:
         return { color: "bg-gray-700", text: "Player" };
     }
