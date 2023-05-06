@@ -3,7 +3,7 @@ import MainLayout from "@/layouts/MainLayout";
 export default function Imprint() {
   return (
     <MainLayout centerContent>
-      <div className="max-w-4xl mx-auto text-xl">
+      <div className="max-w-5xl mx-auto text-xl">
         <h1 className="font-bold text-5xl mb-2">Privacy Policy</h1>
         <p>
           At this point in time, Xenyria Tools does not collect any user data.

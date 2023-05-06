@@ -3,16 +3,23 @@ import ActiveLink from "./ActiveLink";
 import { HardDrives, User, Wrench } from "@phosphor-icons/react";
 
 const links = [
-  { href: "/", label: "User Lookup", icon: User, alternativePrefix: "/user" },
+  { href: "/", label: "User Lookup", icon: User, alternativePrefix: "/player" },
   { href: "/server", label: "Server Stats", icon: HardDrives },
   { href: "/more-tools", label: "More Tools", icon: Wrench },
 ];
 
-export default function Navbar() {
+export default function Navbar({ tabs }: { tabs?: boolean }) {
   return (
-    <div style={{ height: "60px" }}>
-      <div className="flex justify-center fixed w-full bg-gray-900 bg-opacity-75 backdrop-filter backdrop-blur-lg">
-        <div className="flex justify-between w-full max-w-4xl py-3">
+    <div
+      className={tabs ? "fixed w-full" : undefined}
+      style={{ height: "60px" }}
+    >
+      <div
+        className={`flex justify-center w-full ${
+          tabs ? "bg-gray-800" : "bg-gray-900 fixed"
+        } bg-opacity-75 backdrop-filter backdrop-blur-lg`}
+      >
+        <div className="flex justify-between w-full max-w-5xl py-3">
           <Link className="flex items-center space-x-2 cursor-pointer" href="/">
             <h1 className="text-2xl font-bold">Xenyria Tools</h1>
             <span className="bg-red-500 rounded-full px-2.5 font-medium">

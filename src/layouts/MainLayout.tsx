@@ -5,9 +5,11 @@ import { ReactNode } from "react";
 export default function MainLayout({
   children,
   centerContent,
+  tabs,
 }: {
   children: ReactNode;
   centerContent?: boolean;
+  tabs?: boolean;
 }) {
   return (
     <div
@@ -16,14 +18,14 @@ export default function MainLayout({
     >
       {centerContent ? (
         <>
-          <Navbar />
+          <Navbar tabs={tabs} />
           <div>{children}</div>
           <Footer />
         </>
       ) : (
         <>
           <div>
-            <Navbar />
+            <Navbar tabs={tabs} />
             <div>{children}</div>
           </div>
           <Footer />

@@ -3,7 +3,7 @@ import MainLayout from "@/layouts/MainLayout";
 export default function Imprint() {
   return (
     <MainLayout centerContent>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <h1 className="font-bold text-5xl">Imprint</h1>
         <h2 className="font-semibold text-2xl mb-2 mt-1">
           According to § 5 of the German Telemedia Act (TMG)

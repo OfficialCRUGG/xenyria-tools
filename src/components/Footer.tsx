@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <div>
       <div className="bg-black">
-        <div className="max-w-4xl mx-auto w-full flex justify-between items-center py-6">
+        <div className="max-w-5xl mx-auto w-full flex justify-between items-center py-6">
           <div className="flex flex-col">
             <p>© 2023 CRUGG (crg.sh)</p>
             <p>

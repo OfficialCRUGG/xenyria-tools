@@ -64,7 +64,7 @@ const dependencies = [
 export default function Imprint() {
   return (
     <MainLayout centerContent>
-      <div className="max-w-4xl mx-auto text-xl">
+      <div className="max-w-5xl mx-auto text-xl">
         <h1 className="font-bold text-5xl mb-2">Acknowledgements</h1>
         <p>Xenyria Tools is built using the following open source projects:</p>
         <ul className="list-disc list-inside">
