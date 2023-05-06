@@ -98,6 +98,9 @@ export default function PlayerView({
                   capeUrl={`https://crafatar.com/capes/${player.uuid}`}
                   height="400"
                   width="250"
+                  onReady={({ viewer }) => {
+                    viewer.controls.enableZoom = false;
+                  }}
                 />
               </div>
               <RankBadge category={rank.rankCategory} />
