@@ -16,12 +16,12 @@ export default function Navbar({ tabs }: { tabs?: boolean }) {
 
   return (
     <div
-      className={tabs ? "fixed w-full" : undefined}
+      className={tabs ? "fixed z-[99] w-full" : undefined}
       style={{ height: "60px" }}
     >
       <div
         className={`flex justify-center w-full ${
-          tabs ? "bg-gray-800" : "bg-gray-900 fixed"
+          tabs ? "bg-gray-800" : "bg-gray-900 fixed z-[99]"
         } bg-opacity-75 backdrop-filter backdrop-blur-lg`}
       >
         <Container className="flex justify-between w-full py-3">

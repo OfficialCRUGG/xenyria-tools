@@ -25,11 +25,13 @@
     "react-dom": "18.2.0",
     "react-modal-sheet": "^1.10.2",
     "react-skinview3d": "^5.0.1",
+    "request-ip": "^3.3.0",
     "tailwindcss": "3.3.2",
     "typescript": "5.0.4",
     "xenyria-sdk": "link:/Users/crugg/code/xenyria-sdk"
   },
   "devDependencies": {
+    "@types/request-ip": "^0.0.37",
     "xenyria-api-types": "^0.5.0"
   }
 }

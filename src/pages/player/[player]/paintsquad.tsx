@@ -1,8 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 import DataCard from "@/components/DataCard";
 
 import PlayerLayout from "@/layouts/PlayerLayout";
 import { gameModeName } from "@/lib/paintsquad";
 import { getSDK } from "@/lib/sdk";
+import { LeaderboardPositionResponseData } from "@/pages/api/paintsquad/leaderboardPosition";
 import { prettyNumber } from "@blazingworks/utils/numbers";
 import {
   Barricade,
@@ -13,19 +15,15 @@ import {
   User as UserIcon,
   X,
 } from "@phosphor-icons/react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   PlayerRank,
   Player,
   PSPlayerData,
   PartialPSMatchInterfaceJSON,
+  PSLeaderboardEntryInterface,
 } from "xenyria-sdk";
-
-const ReactSkinview3d = dynamic(() => import("react-skinview3d"), {
-  ssr: false,
-});
 
 export async function getServerSideProps({ params }: any) {
   try {
@@ -68,6 +66,178 @@ export default function PlayerPSView({
   const [statsOpen, setStatsOpen] = useState<boolean>(true);
   const [leaderboardOpen, setLeaderboardOpen] = useState<boolean>(true);
   const [matchesOpen, setMatchedOpen] = useState<boolean>(true);
+
+  const timeUnitTabData = useMemo<Record<string, string>>(() => {
+    return {
+      "All-time": "all_time",
+      Monthly: "month",
+      Weekly: "week",
+    };
+  }, []);
+
+  const modeTabData = useMemo<Record<string, string>>(() => {
+    return {
+      Global: "global",
+      "Turf War": "turfwar",
+      Deathmatch: "deathmatch",
+      Rainmaker: "rainmaker",
+      Splatzones: "splatzones",
+      "Tower Control": "tower_control",
+      Eightball: "eightball",
+      Conquest: "conquest",
+      "Clam Attack": "clam_attack",
+    };
+  }, []);
+
+  const statsTabs = Object.keys(timeUnitTabData);
+  const statsSecondaryTabs = Object.keys(modeTabData);
+
+  const [statsTab, setStatsTab] = useState<string>(statsTabs[0]);
+  const [statsSecondaryTab, setStatsSecondaryTab] = useState<string>(
+    statsSecondaryTabs[0]
+  );
+  const [statsLoading, setStatsLoading] = useState<boolean>(false);
+  const [statsData, setStatsData] = useState<{
+    wins: string;
+    losses: string;
+    points: string;
+    kills: string;
+    assists: string;
+    deaths: string;
+  }>({
+    wins: "0",
+    losses: "0",
+    points: "0",
+    kills: "0",
+    assists: "0",
+    deaths: "0",
+  });
+
+  const fetchStats = useCallback(async () => {
+    if (!player) return;
+    setStatsLoading(true);
+    fetch(
+      `/api/paintsquad/stats?xenId=${player.xenId}&timespan=${timeUnitTabData[statsTab]}&rankingType=${modeTabData[statsSecondaryTab]}`
+    ).then(async (res) => {
+      const data = (await res.json()).data;
+      if (!data) {
+        setStatsData({
+          wins: "0",
+          losses: "0",
+          points: "0",
+          kills: "0",
+          assists: "0",
+          deaths: "0",
+        });
+        return setStatsLoading(false);
+      }
+      setStatsData({
+        wins: prettyNumber(data.wins),
+        losses: prettyNumber(data.losses),
+        points: prettyNumber(data.points),
+        kills: prettyNumber(data.kills),
+        assists: prettyNumber(data.assists),
+        deaths: prettyNumber(data.deaths),
+      });
+      setStatsLoading(false);
+    });
+  }, [player, statsTab, statsSecondaryTab, timeUnitTabData, modeTabData]);
+
+  const [lastStatsFetched, setLastStatsFetched] = useState<
+    [string, string] | undefined
+  >();
+
+  useEffect(() => {
+    if (
+      lastStatsFetched &&
+      lastStatsFetched[0] === statsTab &&
+      lastStatsFetched[1] === statsSecondaryTab
+    )
+      return;
+    setLastStatsFetched([statsTab, statsSecondaryTab]);
+    fetchStats();
+  }, [statsTab, statsSecondaryTab, fetchStats, lastStatsFetched]);
+
+  /* Leaderboard */
+
+  const dummyPlayer = useMemo(
+    () => ({
+      xenId: -1,
+      username: "Steve",
+      uuid: "c06f8906-4c8a-4911-9c29-ea1dbd1aab82",
+      position: 0,
+      wins: 0,
+      losses: 0,
+      points: 0,
+      kills: 0,
+      assists: 0,
+      deaths: 0,
+    }),
+    []
+  );
+
+  const leaderboardTabs = Object.keys(timeUnitTabData);
+  const leaderboardSecondaryTabs = Object.keys(modeTabData);
+
+  const [leaderboardTab, setLeaderboardTab] = useState<string>(
+    leaderboardTabs[0]
+  );
+  const [leaderboardSecondaryTab, setLeaderboardSecondaryTab] =
+    useState<string>(leaderboardSecondaryTabs[0]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState<boolean>(false);
+  const [leaderboardData, setLeaderboardData] =
+    useState<LeaderboardPositionResponseData>({
+      above: [],
+      player: dummyPlayer,
+      below: [],
+    });
+
+  const fetchLeaderboard = useCallback(async () => {
+    if (!player) return;
+    setLeaderboardLoading(true);
+    fetch(
+      `/api/paintsquad/leaderboardPosition?xenId=${player.xenId}&timespan=${timeUnitTabData[leaderboardTab]}&rankingType=${modeTabData[leaderboardSecondaryTab]}`
+    ).then(async (res) => {
+      const data = (await res.json()).data;
+      if (!data) {
+        setLeaderboardData({
+          above: [],
+          player: dummyPlayer,
+          below: [],
+        });
+        return setLeaderboardLoading(false);
+      }
+      setLeaderboardData(data);
+      setLeaderboardLoading(false);
+    });
+  }, [
+    player,
+    leaderboardTab,
+    leaderboardSecondaryTab,
+    timeUnitTabData,
+    modeTabData,
+    dummyPlayer,
+  ]);
+
+  const [lastLeaderboardFetched, setLastLeaderboardFetched] = useState<
+    [string, string] | undefined
+  >();
+
+  useEffect(() => {
+    if (
+      lastLeaderboardFetched &&
+      lastLeaderboardFetched[0] === leaderboardTab &&
+      lastLeaderboardFetched[1] === leaderboardSecondaryTab
+    )
+      return;
+    setLastLeaderboardFetched([leaderboardTab, leaderboardSecondaryTab]);
+    fetchLeaderboard();
+  }, [
+    leaderboardTab,
+    leaderboardSecondaryTab,
+    fetchLeaderboard,
+    lastLeaderboardFetched,
+  ]);
 
   return (
     <PlayerLayout player={player} rank={rank} notFound={notFound}>
@@ -121,12 +291,63 @@ export default function PlayerPSView({
         onHeadingClick={() => {
           setStatsOpen(!statsOpen);
         }}
+        tabs={statsTabs}
+        tab={statsTab}
+        setTab={setStatsTab}
+        secondaryTabs={statsSecondaryTabs}
+        secondaryTab={statsSecondaryTab}
+        setSecondaryTab={setStatsSecondaryTab}
+        loading={statsLoading}
       >
-        <div className="flex flex-col md:flex-row items-center justify-center space-x-2">
-          <Barricade weight="fill" size={48} />
-          <h3 className="text-2xl font-semibold text-center">
-            This section is still in development!
-          </h3>
+        <div className="grid grid-cols-3 grid-cols-[min-content,1fr] gap-x-6 gap-y-4">
+          <div className="flex flex-col">
+            <div className="font-regular whitespace-nowrap text-base text-white/75">
+              Wins
+            </div>
+            <div className="w-full place-self-center text-2xl font-bold">
+              {statsData.wins}
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <div className="font-regular whitespace-nowrap text-base text-white/75">
+              Losses
+            </div>
+            <div className="w-full place-self-center text-2xl font-bold">
+              {statsData.losses}
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <div className="font-regular whitespace-nowrap text-base text-white/75">
+              Points
+            </div>
+            <div className="w-full place-self-center text-2xl font-bold">
+              {statsData.points}
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <div className="font-regular whitespace-nowrap text-base text-white/75">
+              Kills
+            </div>
+            <div className="w-full place-self-center text-2xl font-bold">
+              {statsData.kills}
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <div className="font-regular whitespace-nowrap text-base text-white/75">
+              Assists
+            </div>
+            <div className="w-full place-self-center text-2xl font-bold">
+              {statsData.assists}
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <div className="font-regular whitespace-nowrap text-base text-white/75">
+              Deaths
+            </div>
+            <div className="w-full place-self-center text-2xl font-bold">
+              {statsData.deaths}
+            </div>
+          </div>
         </div>
       </DataCard>
       <DataCard
@@ -136,12 +357,106 @@ export default function PlayerPSView({
         onHeadingClick={() => {
           setLeaderboardOpen(!leaderboardOpen);
         }}
+        tabs={leaderboardTabs}
+        tab={leaderboardTab}
+        setTab={setLeaderboardTab}
+        secondaryTabs={leaderboardSecondaryTabs}
+        secondaryTab={leaderboardSecondaryTab}
+        setSecondaryTab={setLeaderboardSecondaryTab}
+        loading={leaderboardLoading}
       >
-        <div className="flex flex-col md:flex-row items-center justify-center space-x-2">
-          <Barricade weight="fill" size={48} />
-          <h3 className="text-2xl font-semibold text-center">
-            This section is still in development!
-          </h3>
+        <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-2 w-full">
+            {(leaderboardData.player as PSLeaderboardEntryInterface)
+              .position ? (
+              <>
+                {leaderboardData.above.length >= 2 ? (
+                  <LeaderboardItem
+                    username={leaderboardData.above[0]?.username}
+                    uuid={leaderboardData.above[0]?.uuid}
+                    position={leaderboardData.above[0]?.position}
+                    points={leaderboardData.above[0]?.points}
+                    cardPosition={2}
+                  />
+                ) : (
+                  <LeaderboardItem invisible cardPosition={2} />
+                )}
+                {leaderboardData.above.length >= 2 ? (
+                  <LeaderboardItem
+                    username={leaderboardData.above[1]?.username}
+                    uuid={leaderboardData.above[1]?.uuid}
+                    position={leaderboardData.above[1]?.position}
+                    points={leaderboardData.above[1]?.points}
+                    cardPosition={1}
+                  />
+                ) : leaderboardData.above.length === 1 ? (
+                  <LeaderboardItem
+                    username={leaderboardData.above[0]?.username}
+                    uuid={leaderboardData.above[0]?.uuid}
+                    position={leaderboardData.above[0]?.position}
+                    points={leaderboardData.above[0]?.points}
+                    cardPosition={1}
+                  />
+                ) : (
+                  <LeaderboardItem invisible cardPosition={1} />
+                )}
+              </>
+            ) : (
+              <>
+                <LeaderboardItem
+                  username={leaderboardData.above[1]?.username}
+                  uuid={leaderboardData.above[1]?.uuid}
+                  position={leaderboardData.above[1]?.position}
+                  points={leaderboardData.above[1]?.points}
+                  cardPosition={2}
+                />
+                <LeaderboardItem seperator cardPosition={1} />
+              </>
+            )}
+          </div>
+          <LeaderboardItem
+            username={leaderboardData.player.username}
+            uuid={leaderboardData.player.uuid}
+            position={
+              (leaderboardData.player as PSLeaderboardEntryInterface)
+                .position || undefined
+            }
+            points={leaderboardData.player.points}
+          />
+          <div className="flex flex-col space-y-2 w-full">
+            {(leaderboardData.player as PSLeaderboardEntryInterface)
+              .position ? (
+              <>
+                {leaderboardData.below.length > 0 ? (
+                  <LeaderboardItem
+                    username={leaderboardData.below[0]?.username}
+                    uuid={leaderboardData.below[0]?.uuid}
+                    position={leaderboardData.below[0]?.position}
+                    points={leaderboardData.below[0]?.points}
+                    cardPosition={1}
+                  />
+                ) : (
+                  <LeaderboardItem invisible cardPosition={1} />
+                )}
+                {leaderboardData.below.length > 1 ? (
+                  <LeaderboardItem
+                    username={leaderboardData.below[1]?.username}
+                    uuid={leaderboardData.below[1]?.uuid}
+                    position={leaderboardData.below[1]?.position}
+                    points={leaderboardData.below[1]?.points}
+                    cardPosition={2}
+                  />
+                ) : (
+                  <LeaderboardItem invisible cardPosition={2} />
+                )}
+              </>
+            ) : (
+              <>
+                <LeaderboardItem invisible />
+                <LeaderboardItem invisible />
+              </>
+            )}
+          </div>
         </div>
       </DataCard>
       <DataCard
@@ -182,5 +497,62 @@ export default function PlayerPSView({
         </div>
       </DataCard>
     </PlayerLayout>
+  );
+}
+
+function LeaderboardItem({
+  username,
+  uuid,
+  position,
+  points,
+  seperator,
+  invisible,
+  cardPosition = 0,
+}: {
+  username?: string;
+  uuid?: string;
+  position?: number;
+  points?: number;
+  seperator?: boolean;
+  invisible?: boolean;
+  cardPosition?: number;
+}) {
+  return (
+    <div
+      className={`w-full flex ${
+        seperator ? "justify-center" : "justify-between bg-gray-800"
+      } items-center px-4 py-2 rounded-lg${invisible ? " invisible" : ""} ${
+        cardPosition === 1
+          ? "transform scale-[95%] opacity-75"
+          : cardPosition === 2
+          ? "transform scale-[90%] opacity-50"
+          : ""
+      }`}
+    >
+      {seperator ? (
+        <div className="flex h-12 items-center justify-center space-x-2">
+          {Array.from({ length: 3 }, (_, i) => (
+            <div key={i} className="h-2 w-2 bg-white/25 rounded-full" />
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="flex space-x-4 items-center">
+            <h5 className="font-bold text-2xl">{position || "???"}</h5>
+            {uuid ? (
+              <img
+                src={`https://crafatar.com/avatars/${uuid}`}
+                alt=""
+                className="h-12 w-12 rounded-md"
+              />
+            ) : (
+              <div className="h-12 w-12 rounded-md bg-gray-700" />
+            )}
+            <h5 className="font-semibold text-xl">{username || "Unknown"}</h5>
+          </div>
+          <p className="font-medium text-lg">{prettyNumber(points || 0)}</p>
+        </>
+      )}
+    </div>
   );
 }

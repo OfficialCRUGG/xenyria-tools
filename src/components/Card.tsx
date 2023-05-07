@@ -9,7 +9,7 @@ export default function Card({
   noPadding?: boolean;
 }) {
   return (
-    <div className="bg-white bg-opacity-[2%] w-full border border-white/25 rounded-lg text-lg">
+    <div className="bg-white bg-opacity-[2%] w-full border border-white/25 rounded-lg text-lg overflow-hidden">
       {!noPadding ? (
         <div className="py-2 px-4">{children}</div>
       ) : (
