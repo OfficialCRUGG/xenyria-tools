@@ -1,0 +1,28 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model PlayerLookup {
+  id    Int    @id @default(autoincrement())
+  uuid  String
+  month Int
+  year  Int
+  count Int
+}
+
+model PlayerCount {
+  id         Int      @id @default(autoincrement())
+  timestamp  DateTime @default(now())
+  total      Int
+  paintsquad Int
+  rush       Int
+  kingdoms   Int
+}

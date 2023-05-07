@@ -3,7 +3,7 @@ export function gameModeName(id: number) {
     case 1:
       return "Weapon Test";
     case 6:
-      return "Splatzones";
+      return "Paintzones";
     case 2:
       return "Turf War";
     case 10:

@@ -81,7 +81,7 @@ export default function PlayerPSView({
       "Turf War": "turfwar",
       Deathmatch: "deathmatch",
       Rainmaker: "rainmaker",
-      Splatzones: "splatzones",
+      Paintzones: "splatzones",
       "Tower Control": "tower_control",
       Eightball: "eightball",
       Conquest: "conquest",
