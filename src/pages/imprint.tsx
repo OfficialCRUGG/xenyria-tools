@@ -1,9 +1,10 @@
+import Container from "@/components/Container";
 import MainLayout from "@/layouts/MainLayout";
 
 export default function Imprint() {
   return (
     <MainLayout centerContent>
-      <div className="max-w-5xl mx-auto">
+      <Container>
         <h1 className="font-bold text-5xl">Imprint</h1>
         <h2 className="font-semibold text-2xl mb-2 mt-1">
           According to § 5 of the German Telemedia Act (TMG)
@@ -50,7 +51,7 @@ export default function Imprint() {
           infringement become known to us, we will remove the respective link
           immediately.
         </p>
-      </div>
+      </Container>
     </MainLayout>
   );
 }

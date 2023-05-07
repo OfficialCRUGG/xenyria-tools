@@ -41,3 +41,21 @@ body,
       </svg>');
   background-size: 30px 30px;
 }
+
+/* Sheet */
+
+.react-modal-sheet-backdrop {
+  @apply !bg-gray-800 !bg-opacity-50 backdrop-filter backdrop-blur-sm;
+}
+.react-modal-sheet-container {
+  @apply !bg-gray-900 !shadow-none !rounded-t-3xl;
+}
+.react-modal-sheet-header {
+  /* custom styles */
+}
+.react-modal-sheet-drag-indicator {
+  /* custom styles */
+}
+.react-modal-sheet-content {
+  /* custom styles */
+}

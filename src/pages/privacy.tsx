@@ -1,9 +1,10 @@
+import Container from "@/components/Container";
 import MainLayout from "@/layouts/MainLayout";
 
 export default function Imprint() {
   return (
     <MainLayout centerContent>
-      <div className="max-w-5xl mx-auto text-xl">
+      <Container className="text-xl">
         <h1 className="font-bold text-5xl mb-2">Privacy Policy</h1>
         <p>
           At this point in time, Xenyria Tools does not collect any user data.
@@ -13,7 +14,7 @@ export default function Imprint() {
           on servers rented by my company BlazingWorks from Hetzner&apos;s data
           center in Falkenstein, Germany.
         </p>
-      </div>
+      </Container>
     </MainLayout>
   );
 }

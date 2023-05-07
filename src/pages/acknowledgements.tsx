@@ -1,3 +1,4 @@
+import Container from "@/components/Container";
 import MainLayout from "@/layouts/MainLayout";
 
 const dependencies = [
@@ -61,11 +62,13 @@ const dependencies = [
   },
 ];
 
-export default function Imprint() {
+export default function Acknowledgements() {
   return (
     <MainLayout centerContent>
-      <div className="max-w-5xl mx-auto text-xl">
-        <h1 className="font-bold text-5xl mb-2">Acknowledgements</h1>
+      <Container className="text-xl">
+        <h1 className="font-bold text-5xl mb-2 hyphen-manual">
+          Acknowledge&shy;ments
+        </h1>
         <p>Xenyria Tools is built using the following open source projects:</p>
         <ul className="list-disc list-inside">
           {dependencies.map(({ name, url, license, licenseUrl }) => (
@@ -91,7 +94,7 @@ export default function Imprint() {
             </li>
           ))}
         </ul>
-      </div>
+      </Container>
     </MainLayout>
   );
 }
