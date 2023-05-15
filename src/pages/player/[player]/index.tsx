@@ -63,7 +63,7 @@ export async function getServerSideProps({ params }: any) {
     return {
       props: {
         player: player.toJSON(),
-        rank,
+        rank: rank.toJSON(),
         votes,
         lookups: {
           month: playerLookup?.count || 0,

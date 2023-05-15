@@ -1,13 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import DataCard from "@/components/DataCard";
-
+import { DateTime } from "luxon";
 import PlayerLayout from "@/layouts/PlayerLayout";
 import { gameModeName } from "@/lib/paintsquad";
 import { getSDK } from "@/lib/sdk";
 import { LeaderboardPositionResponseData } from "@/pages/api/paintsquad/leaderboardPosition";
 import { prettyNumber } from "@blazingworks/utils/numbers";
 import {
-  Barricade,
   ChartLine,
   Check,
   GameController,
@@ -17,6 +16,7 @@ import {
 } from "@phosphor-icons/react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { RESTGetAPIPaintSquadVersionDataResponse } from "xenyria-api-types";
 import {
   PlayerRank,
   Player,
@@ -31,13 +31,15 @@ export async function getServerSideProps({ params }: any) {
     const rank = await player.getRank();
     const data = await player.paintsquad.getData();
     const lastMatches = await player.paintsquad.getLastMatches();
+    const psVersion = await getSDK().rawClient.paintsquad.versionData();
 
     return {
       props: {
         player: player.toJSON(),
-        rank,
+        rank: rank.toJSON(),
         data,
         lastMatches: lastMatches.map((match) => match.toJSON()),
+        psVersion,
       },
     };
   } catch (error) {
@@ -55,12 +57,14 @@ export default function PlayerPSView({
   data,
   lastMatches,
   notFound,
+  psVersion,
 }: {
   player?: Player;
   rank?: PlayerRank;
   data?: PSPlayerData;
   lastMatches?: PartialPSMatchInterfaceJSON[];
   notFound?: boolean;
+  psVersion: RESTGetAPIPaintSquadVersionDataResponse;
 }) {
   const [generalOpen, setGeneralOpen] = useState<boolean>(true);
   const [statsOpen, setStatsOpen] = useState<boolean>(true);
@@ -157,6 +161,17 @@ export default function PlayerPSView({
     setLastStatsFetched([statsTab, statsSecondaryTab]);
     fetchStats();
   }, [statsTab, statsSecondaryTab, fetchStats, lastStatsFetched]);
+
+  /* Rank */
+
+  const publicRank = psVersion?.data.public_mm_ladder.find(
+    (l) => (data?.mmr.public || 0) >= l.start && (data?.mmr.public || 0) < l.end
+  );
+
+  const invasionRank = psVersion?.data.invasion_mm_ladder.find(
+    (l) =>
+      (data?.mmr.invasion || 0) >= l.start && (data?.mmr.invasion || 0) < l.end
+  );
 
   /* Leaderboard */
 
@@ -275,12 +290,52 @@ export default function PlayerPSView({
             {prettyNumber(data?.xp || 0)}
           </div>
           <div className="font-semibold whitespace-nowrap">Rank</div>
-          <div className="w-full place-self-center">
-            this will be painful to implement
+          <div className="w-full place-self-center flex items-center space-x-2">
+            <div className="h-6 w-32 bg-black bg-opacity-[35%] rounded-lg overflow-hidden">
+              <div
+                className="h-full bg-white"
+                style={{
+                  width: `${
+                    (((data?.mmr.public || 0) - (publicRank?.start || 0)) /
+                      ((publicRank?.end || 0) - (publicRank?.start || 0))) *
+                    100
+                  }%`,
+                }}
+              ></div>
+            </div>
+            <p>
+              {publicRank?.title.english} (
+              {Math.round(
+                (((data?.mmr.public || 0) - (publicRank?.start || 0)) /
+                  ((publicRank?.end || 0) - (publicRank?.start || 0))) *
+                  100
+              )}
+              % to next rank)
+            </p>
           </div>
           <div className="font-semibold whitespace-nowrap">Invasion Rank</div>
-          <div className="w-full place-self-center">
-            this will be painful to implement
+          <div className="w-full place-self-center flex items-center space-x-2">
+            <div className="h-6 w-32 bg-black bg-opacity-[35%] rounded-lg overflow-hidden">
+              <div
+                className="h-full bg-white"
+                style={{
+                  width: `${
+                    (((data?.mmr.invasion || 0) - (invasionRank?.start || 0)) /
+                      ((invasionRank?.end || 0) - (invasionRank?.start || 0))) *
+                    100
+                  }%`,
+                }}
+              ></div>
+            </div>
+            <p>
+              {invasionRank?.title.english} (
+              {Math.round(
+                (((data?.mmr.invasion || 0) - (invasionRank?.start || 0)) /
+                  ((invasionRank?.end || 0) - (invasionRank?.start || 0))) *
+                  100
+              )}
+              % to next rank)
+            </p>
           </div>
         </div>
       </DataCard>
@@ -299,7 +354,7 @@ export default function PlayerPSView({
         setSecondaryTab={setStatsSecondaryTab}
         loading={statsLoading}
       >
-        <div className="grid grid-cols-3 grid-cols-[min-content,1fr] gap-x-6 gap-y-4">
+        <div className="grid grid-cols-3 gap-x-6 gap-y-4">
           <div className="flex flex-col">
             <div className="font-regular whitespace-nowrap text-base text-white/75">
               Wins
@@ -478,7 +533,17 @@ export default function PlayerPSView({
                       {gameModeName(match.gamemode)}
                     </h4>
                     <h5 className="text-sm text-white/75">
-                      {match.arena} ▪ {new Date(match.endedAt).toUTCString()}
+                      {
+                        psVersion.data.arena.battle.find(
+                          (a) => a.id === match.arena
+                        )?.name.english
+                      }{" "}
+                      ▪ {new Date(match.endedAt).toUTCString()}
+                      {/*
+                      {DateTime.fromMillis(match.endedAt).toLocaleString(
+                        DateTime.DATETIME_MED
+                      )}{" "}
+                      ({DateTime.fromMillis(match.endedAt).toRelative()})*/}
                     </h5>
                   </div>
                 </div>
